@@ -20,11 +20,14 @@ if [ -e $package.zip ]; then
 	# Unpack
 	unzip $package.zip
 	cd $package
-	wget https://github.com/xpirt/sdat2img/blob/master/sdat2img.py # Credits to @xpirt for sdat2img
-	python sdat2img.py system.transfer.list system.new.dat system.img
-	rm sdat2img.py system.transfer.list system.new.dat
+	# If the block based method is used
+	if [ -e system.new.dat ]; then
+		wget https://github.com/xpirt/sdat2img/blob/master/sdat2img.py # Credits to @xpirt for sdat2img
+		python sdat2img.py system.transfer.list system.new.dat system.img
+		rm sdat2img.py system.transfer.list system.new.dat
+	fi
 	mkdir sys # Temporary dir
-	sudo mount -o loop system.imp sys/
+	sudo mount -o loop system.img sys/
 	mkdir system # Real dir
 	cp -R sys/* system/
 	sudo umount sys/
