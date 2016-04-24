@@ -4,7 +4,7 @@
 device=gemini
 vendor=xiaomi
 backup_dir=/media/louis/SAUVEGARDE/MIUI/
-really_want_backup=1
+really_want_backup=0
 package=$1
 local_dir="$(pwd)"
 
@@ -18,7 +18,7 @@ if [ -e $package.zip ]; then
 	fi
 
 	# Unpack
-	unzip $package.zip
+	unzip $package.zip -d $package/
 	cd $package
 	# If the block based method is used
 	if [ -e system.new.dat ]; then
@@ -28,6 +28,7 @@ if [ -e $package.zip ]; then
 	fi
 	mkdir sys # Temporary dir
 	sudo mount -o loop system.img sys/
+	rm system.img
 	mkdir system # Real dir
 	cp -R sys/* system/
 	sudo umount sys/
@@ -40,12 +41,12 @@ if [ -e $package.zip ]; then
 	mkdir android
 	git clone git@git.aosparadox.org:CyanogenMod/android_device_xiaomi_gemini.git android/device/xiaomi/gemini
 	cd android/device/xiaomi/gemini
-	./extract-files.sh -d $local_dir/	
-	mv vendor/xiaomi $local_dir/proprietary_vendor_xiaomi
+	./extract-files.sh -d $local_dir/
+	mv android/vendor/xiaomi $local_dir/proprietary_vendor_xiaomi
 
 	# Cleanup
 	cd $local_dir
-	rm -rf $package.zip $package/ system* android/
+	rm -rf $package.zip $package/ system* android/ META-INF/ firmware-update/ boot.img cust/
 
 	# TODO
 	echo "TODO :"
@@ -53,6 +54,8 @@ if [ -e $package.zip ]; then
 	echo "- Updating ramdisk"
 	echo "- Clarifying code with goto ?"
 	echo "- Specific goto in case of missing file"
+	echo "- De-odex the package"
+	echo "- git checkout gemini/proprietary/etc/data"
 else
 	echo 'File '$package'.zip do not exist'
-
+fi
